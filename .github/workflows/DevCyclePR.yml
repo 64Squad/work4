@@ -1,0 +1,19 @@
+name: PR Insights
+
+on:
+  workflow_call:
+
+jobs:
+  dvc-feature-flag-insights:
+    runs-on: ubuntu-latest
+    name: Generate DevCycle PR Insights
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: DevCycleHQ/feature-flag-pr-insights-action@v2.0.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          project-key: ${{ secrets.DVC_PROJECT_KEY }}
+          client-id: ${{ secrets.DVC_CLIENT_ID }}
+          client-secret: ${{ secrets.DVC_CLIENT_SECRET }}
