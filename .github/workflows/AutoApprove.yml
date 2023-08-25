@@ -1,0 +1,39 @@
+name: Auto Approve
+
+on:
+  workflow_call:
+
+jobs:
+  auto_approve:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if all steps are successful
+        run: |
+          steps_statuses=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs" | \
+            jq -r '.jobs[] | select(.name | contains("steps_")) | .conclusion')
+
+          if echo "$steps_statuses" | grep -q 'failure'; then
+            echo "Not all steps passed, skipping auto-approve."
+            exit 0
+          fi
+
+      - name: Get PR author's username
+        id: get_author
+        run: echo "::set-output name=author::${{ github.event.pull_request.user.login }}"
+
+      - name: Get PR author's role
+        id: get_author_role
+        run: |
+          response=$(curl -s -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/orgs/${{ github.repository_owner }}/members/${{ steps.get_author.outputs.author }}" | \
+            jq -r '.role')
+          echo "::set-output name=role::$response"
+
+      - name: Approve if author is admin
+        if: steps.get_author_role.outputs.role == 'admin'
+        run: |
+          echo "Approving the PR"
+          curl -X POST -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/reviews" \
+            -d '{"event": "APPROVE"}'
