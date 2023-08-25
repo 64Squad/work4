@@ -1,4 +1,4 @@
-name: PR Insights
+name: PR Insights 🎓
 
 on:
   workflow_call:
@@ -6,7 +6,7 @@ on:
 jobs:
   dvc-feature-flag-insights:
     runs-on: ubuntu-latest
-    name: Generate DevCycle PR Insights
+    name: Generate DevCycle PR Insights 📝
     steps:
       - uses: actions/checkout@v2
         with:
