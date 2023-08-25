@@ -1,0 +1,27 @@
+name: Auto Merge and Version Tag
+
+on:
+  workflow_call:
+
+jobs:
+  merge_and_tag:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Merge to v.1.x
+        run: |
+          git checkout v.1.x
+          git merge main
+          git push origin v.1.x
+
+      - name: Determine Version Type
+        id: determine_version
+        run: echo "::set-output name=version::$(grep -oP '^v\d+\.\d+' .github/workflows/merge.yml)"
+
+      - name: Create Version Tag
+        run: |
+          git tag -a ${{ steps.determine_version.outputs.version }} -m "Version ${{ steps.determine_version.outputs.version }}"
+          git push origin ${{ steps.determine_version.outputs.version }}
