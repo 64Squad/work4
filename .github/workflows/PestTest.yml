@@ -1,4 +1,4 @@
-name: Tests PHP by PHPUnit
+name: Tests PHP by Pest
 
 on:
   workflow_call:
@@ -38,7 +38,7 @@ jobs:
         run: php artisan key:generate
 
       - name: Execute tests
-        run: vendor/bin/phpunit
+        run: vendor/bin/pest
 
       - name: Report Results
         if: failure()
