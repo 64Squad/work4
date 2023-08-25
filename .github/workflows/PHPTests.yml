@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         php: [8.1, 8.2]
 
@@ -39,3 +39,37 @@ jobs:
 
       - name: Execute tests
         run: vendor/bin/phpunit
+
+      - name: Report Results
+        if: failure()
+        run: |
+          echo "::set-output name=status::failed"
+          echo "::set-output name=comment::Tests failed in PHP ${{ matrix.php }}."
+
+      - name: Mark as Skipped
+        if: success()
+        run: |
+          echo "::set-output name=status::skipped"
+          echo "::set-output name=comment::Tests skipped in PHP ${{ matrix.php }}."
+
+  comment:
+    needs: tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Test Status
+        id: check_test_status
+        run: echo "Test status is ${{ needs.tests.outputs.status }}"
+
+      - name: Create Comment
+        if: steps.check_test_status.outputs.status == 'failed' || steps.check_test_status.outputs.status == 'skipped'
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const comment = "${{ steps.check_test_status.outputs.comment }}";
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
