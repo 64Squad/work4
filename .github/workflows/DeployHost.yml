@@ -1,0 +1,40 @@
+name: Auto Deploy to Shared Host 🚀
+
+on:
+  workflow_call:
+
+jobs:
+  checkout:
+    name: To the moon 🚀🌕
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout 🛒
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js 📦
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+
+      - name: Install dependencies 📥
+        run: |
+          npm install
+          npm run build
+
+      - name: Set up Composer 📦
+        uses: ramsey/composer-install@v1
+        with:
+          composer-options: --no-dev --no-interaction --no-progress --no-suggest --optimize-autoloader
+
+      - name: Sync files 🔄
+        uses: SamKirkland/FTP-Deploy-Action@4
+        with:
+          ftp-server: ${{ secrets.FTP_SERVER }}
+          ftp-username: ${{ secrets.FTP_USERNAME }}
+          ftp-password: ${{ secrets.FTP_PASSWORD }}
+          local-dir: ./
+          server-dir: /public_html
+          args: --delete
+          exclude: .git*
+          state-name: ${{ github.event.pull_request.number }}
+          log-level	: verbose
