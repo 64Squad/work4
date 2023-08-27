@@ -22,7 +22,7 @@ jobs:
           npm run build
 
       - name: Set up Composer 📦
-        uses: ramsey/composer-install@v1
+        uses: ramsey/composer-install@v2
         with:
           composer-options: --no-dev --no-interaction --no-progress --no-suggest --optimize-autoloader
 
