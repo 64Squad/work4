@@ -8,7 +8,7 @@ jobs:
     runs-on: ubuntu-latest
     name: Generate DevCycle PR Insights 📝
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v3
