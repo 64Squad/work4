@@ -20,12 +20,12 @@ jobs:
     - name: Run Jest tests and generate coverage report
       run: npm test -- --coverage --coverageReporters="json-summary" --coverageReporters="json"
     - name: Archive coverage report (json-summary)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-summary-report
         path: coverage/coverage-summary.json
     - name: Archive coverage report (json)
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: coverage-report
         path: coverage/coverage-final.json
